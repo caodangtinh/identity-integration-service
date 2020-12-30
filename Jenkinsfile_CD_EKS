@@ -1,0 +1,38 @@
+def label = "worker-${UUID.randomUUID().toString()}"
+
+podTemplate(label: label, containers: [
+  containerTemplate(name: 'helm', image: 'core.harbor.domain/library/helm-kubectl:3.2.3', command: 'cat', ttyEnabled: true),
+  containerTemplate(name: 'jnlp', image: 'jenkinsci/jnlp-slave', args: '${computer.jnlpmac} ${computer.name}', envVars: [ 
+      envVar(key: 'JENKINS_URL', value: 'http://jenkins.jenkins.svc.cluster.local:8080')
+    ]
+    )
+],
+volumes: [
+  hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock')
+]) {
+  node(label) {
+    def registry = env.REGISTRY_URL
+    def image = "tcb-docker/identity-integration"
+    def version = "0.0.${BUILD_NUMBER}"
+    def helm_repo_url = "http://13.228.16.201:8081/repository/tcb-helm/"
+    def helm_repo = "tcb-nexus"
+    def app = "identity-integration"
+    def namespace = "identity"
+
+    container('helm') {
+        withCredentials([file(credentialsId: 'eks-kube-config', variable: 'config') ]) {
+            stage('Deploy to kubernetes') {
+            sh """
+            export KUBECONFIG=\${config}
+            helm repo add  ${helm_repo} \
+            --username=testuser \
+            --password=testpassword ${helm_repo_url}
+
+            helm repo update
+            helm upgrade --install ${app} ${helm_repo}/${app} --timeout 300s --version=0.1.0 -n ${namespace}
+            """
+          }
+      }
+    }
+  }
+}

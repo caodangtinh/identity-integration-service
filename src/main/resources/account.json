@@ -1,0 +1,20 @@
+[
+  {
+    "customerId": 123,
+    "customerName": "Jason",
+    "amount": 5000,
+    "currency": "USD"
+  },
+  {
+    "customerId": 456,
+    "customerName": "Jason 1",
+    "amount": 8000,
+    "currency": "VND"
+  },
+  {
+    "customerId": 789,
+    "customerName": "Jason 2",
+    "amount": 9000,
+    "currency": "USD"
+  }
+]

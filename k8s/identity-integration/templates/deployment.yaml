@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-integration
+  namespace: identity
+spec:
+  selector:
+    matchLabels:
+      app: identity-integration
+  template:
+    metadata:
+      labels:
+        app: identity-integration
+    spec:
+      containers:
+      - name: identity-integration
+        image: nexus.dev.tcbdso.cloud/tcb-docker/identity-integration:1.0.0
+        ports:
+        - containerPort: 9090
+        envFrom:
+          - configMapRef:
+              name: identityconfigmap

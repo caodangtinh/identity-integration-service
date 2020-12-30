@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: identity-integration-ingress
+  namespace: identity
+spec:
+  rules:
+  - host: identity-integration.backbase.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: identity-integration
+          servicePort: 9090
